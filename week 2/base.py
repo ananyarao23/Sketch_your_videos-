@@ -34,7 +34,7 @@ class NeuralNetwork:
         """
         sigmoid_z = np.zeros(z.shape)
         # TODO implement sigmoid
-        sigmoid_z = 1/(1+np.exp(-z))
+        # sigmoid_z =
         # TODO implement sigmoid
         return sigmoid_z
 
@@ -48,7 +48,7 @@ class NeuralNetwork:
         """
         derivative_cost = np.zeros(output_activations.shape)
         # TODO calculate Derivative of cost w.r.t final activation
-        derivative_cost = output_activations - y
+        # derivative_cost =
         # TODO calculate Derivative of cost w.r.t final activation
         return derivative_cost
 
@@ -62,24 +62,7 @@ class NeuralNetwork:
         logging.info("Calcuting costs...")
         cost = 0
         # TODO calculate costs
-        # input_data = np.array(list(map(lambda x: x[0], training_data)))
-        # output_data = np.array(list(map(lambda x: x[1], training_data)))
-        # # y_out = np.zeros((self.num_neurons_per_layer_list[-1], 1))
-        # X = input_data.T
-        # for j in range(self.num_layers-1):
-        #     z_j = np.matmul(np.transpose(self.weights[j]),X) + self.biases[j]
-        #     a_j = np.zeros((z_j.shape[0],z_j.shape[1]))
-        #     for i in range(len(input_data)):
-        #         a_j[i] = self.sigmoid(z_j[i]).copy()
-        #     X = a_j
-        # y_out = X.T
-        # diff = y_out - output_data
-        # sq_diff = diff**2
-        # cost = np.sum(sq_diff)/2
-        for data in training_data:
-            diff = (self.forward_pass(data[0]) - data[1])
-            diff = (diff**2)/2
-            cost += np.sum(diff)
+        # calc costs
         # TODO calculate costs
         logging.info("Calcuting costs complete...")
         return cost
@@ -88,7 +71,7 @@ class NeuralNetwork:
         """Derivative of the sigmoid function."""
         derivative_sigmoid = np.zeros(z.shape)
         # TODO calculate derivative of sigmoid function
-        derivative_sigmoid = self.sigmoid(z)*(1-self.sigmoid(z))
+        # derivative_sigmoid =
         # TODO calculate derivative of sigmoid function
         return derivative_sigmoid
 
@@ -100,12 +83,7 @@ class NeuralNetwork:
         """
         nn_output = np.zeros((self.num_neurons_per_layer_list[-1], 1))
         # TODO do a forward pass of the NN and return the final output
-        input_data = x
-        for j in range(self.num_layers-1):
-            z_j = np.matmul(np.transpose(self.weights[j]),input_data) + self.biases[j]
-            a_j = self.sigmoid(z_j)
-            input_data = a_j
-        nn_output = input_data
+        # Here
         # TODO do a forward pass of the NN and return the final output
         return nn_output
 
@@ -124,33 +102,15 @@ class NeuralNetwork:
         num_samples = len(training_data)
         costs_history = []
         for j in range(epochs):
-            # print(f"-----------------EPOCH {j}------------------")
             random.Random(self.seed).shuffle(training_data)
             mini_batches = [training_data[k:k + mini_batch_size] for k in range(0, num_samples, mini_batch_size)]
-            num_batch = 1
             for mini_batch in mini_batches:
-                # print(f"-----------------BATCH PROCESSING {num_batch}-----------------")
-                num_batch += 1
                 # TODO (1) Compute gradients for every data point in the mini batch using your implemented
                 #  "back_propagation" function. Note that the above backward pass is for a single data point.
-
-                dC_db_total = [np.zeros(b.shape) for b in self.biases]
-                dC_dw_total = [np.zeros(w.shape) for w in self.weights]
-                input__x = [mini_batch[i][0].reshape(-1,) for i in range(len(mini_batch))]
-                output_y = [mini_batch[i][1].reshape(-1,) for i in range(len(mini_batch))]
-                for i in range(len(mini_batch)):
-                    input = input__x[i].reshape(-1,1)
-                    output = output_y[i].reshape(-1,1)
-                    x,y = self.back_propagation(input,output)
-                    for j in range(len(dC_db_total)):
-                        dC_db_total[j] += x[j]
-                        dC_dw_total[j] += y[j]
                 #  We'll need to calculate this for all examples in a mini batch and then sum the gradients over this
                 #  batch to do the gradient update step for all weights and biases.
                 # TODO (2) Update biases and weights using the computed gradients
-                for j in range(len(self.weights)):
-                    self.weights[j] -= int((eta/mini_batch_size))*dC_dw_total[j]
-                    self.biases[j] -= int(eta/mini_batch_size)*dC_db_total[j]
+                pass
 
             logging.info("After Epoch {}".format(j + 1))
             self.test_accuracy(test_data)
@@ -176,35 +136,6 @@ class NeuralNetwork:
         # TODO (1) forward pass - calculate layer by layer z's and activations which will be used to calculate gradients
         # TODO (2) backward pass - calculate gradients starting with the output layer and then the hidden layers
         # TODO (3) Return the graduents in lists dC_db, dC_dw
-        Z = []
-        A = []
-        z = x
-        # print("num_layers",self.num_layers)
-        a = x
-        A.append(x)
-        for i in range(self.num_layers-1):
-            # A.append(a)
-            z = np.matmul(self.weights[i].T,z) + self.biases[i]
-            a = self.sigmoid(z)
-            A.append(a)
-            Z.append(z)
-            z = a
-
-        # -----------------------------------------------------
-        dz_dW = np.array([A[-2].reshape(-1) for j in range(dC_dw[-1].shape[1])])
-        temp1 = self.cost_derivative(A[-1],y)*self.sigmoid_derivative(Z[-1])
-        dC_dw[-1] = (temp1*dz_dW).T
-        dC_db[-1] = temp1
-
-        for j in range(self.num_layers-3,-1,-1):
-            temp1 = temp1.reshape(1,-1)
-            temp = np.matmul(temp1,self.weights[j+1].T).reshape(-1,1)
-            temp1 = temp*(self.sigmoid_derivative(Z[j]))
-            dz_dW = np.array([A[j].reshape(-1) for i in range(dC_dw[j].shape[1])])
-            dC_dw[j] = (temp1*dz_dW).T
-            dC_db[j] = temp1
-
-      
         return dC_db, dC_dw
 
     def test_accuracy(self, test_data):
